@@ -1,0 +1,23 @@
+---
+version: "3"
+services:
+  sqs:
+    image: vsouza/sqs-local
+  producer:
+    build:
+      context: .
+      dockerfile: Dockerfile.scratch
+    volumes:
+      - "./bin:/bin"
+    command: /bin/producer
+    links:
+      - sqs
+  consumer:
+    build: 
+      context: .
+      dockerfile: Dockerfile.scratch
+    volumes:
+      - "./bin:/bin"
+    command: /bin/consumer
+    links:
+      - sqs
