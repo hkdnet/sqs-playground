@@ -2,7 +2,9 @@
 version: "3"
 services:
   sqs:
-    build: elasticmq
+    image: softwaremill/elasticmq:0.14.5
+    volumes:
+      - "./elasticmq/custom.conf:/opt/elasticmq.conf"
   producer:
     build:
       context: .
