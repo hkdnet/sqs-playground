@@ -64,9 +64,10 @@ func (c *SQSClient) ReceiveMessage(processor MessageProcessor) error {
 // メッセージを送信する
 func (c *SQSClient) SendMessage(body string) error {
 	params := &sqs.SendMessageInput{
-		MessageBody:  aws.String(body),
-		QueueUrl:     c.queueURL,
-		DelaySeconds: aws.Int64(0),
+		MessageBody:            aws.String(body),
+		QueueUrl:               c.queueURL,
+		MessageDeduplicationId: aws.String("1"),
+		MessageGroupId:         aws.String("g"),
 	}
 
 	_, err := c.svc.SendMessage(params)
