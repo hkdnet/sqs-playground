@@ -71,7 +71,7 @@ func (c *SQSClient) SendMessage(body string) error {
 
 	_, err := c.svc.SendMessage(params)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "send message")
 	}
 
 	return nil
