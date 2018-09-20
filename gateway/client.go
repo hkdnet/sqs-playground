@@ -25,3 +25,54 @@ func NewClient(queueName string, sessionCreator SessionCreator) (*SQSClient, err
 
 	return &SQSClient{svc: svc, queueName: queueName, queueURL: o.QueueUrl}, nil
 }
+
+type Message struct {
+	MessageID     string
+	Body          string
+	ReceiptHandle string
+}
+
+type MessageProcessor interface {
+	Process(m Message) error
+}
+
+func (c *SQSClient) ReceiveMessage(processor MessageProcessor) error {
+	resp, err := c.svc.ReceiveMessage(&sqs.ReceiveMessageInput{
+		QueueUrl: c.queueURL,
+	})
+
+	if err != nil {
+		return errors.Wrap(err, "recv message")
+	}
+
+	for _, m := range resp.Messages {
+		msg := Message{
+			MessageID:     *m.MessageId,
+			Body:          *m.Body,
+			ReceiptHandle: *m.ReceiptHandle,
+		}
+
+		err = processor.Process(msg)
+		if err != nil {
+			return errors.Wrap(err, "processing")
+		}
+	}
+
+	return nil
+}
+
+// メッセージを送信する
+func (c *SQSClient) SendMessage(body string) error {
+	params := &sqs.SendMessageInput{
+		MessageBody:  aws.String(body),
+		QueueUrl:     c.queueURL,
+		DelaySeconds: aws.Int64(0),
+	}
+
+	_, err := c.svc.SendMessage(params)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
