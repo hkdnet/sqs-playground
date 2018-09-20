@@ -13,7 +13,7 @@ services:
     links:
       - sqs
   consumer:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile.scratch
     volumes:
