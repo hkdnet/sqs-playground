@@ -77,3 +77,18 @@ func (c *SQSClient) SendMessage(body string) error {
 
 	return nil
 }
+
+// DeleteMessage trys to delete a message by receiptHandle.
+func (c *SQSClient) DeleteMessage(receiptHandle string) error {
+	params := &sqs.DeleteMessageInput{
+		QueueUrl:      c.queueURL,
+		ReceiptHandle: aws.String(receiptHandle),
+	}
+
+	_, err := c.svc.DeleteMessage(params)
+	if err != nil {
+		return errors.Wrap(err, "delete message")
+	}
+
+	return nil
+}
