@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/hkdnet/sqs-playground/gateway"
 )
@@ -10,11 +11,13 @@ import (
 const sqsURL = "http://sqs:9324"
 const queueName = "q"
 
-type MessageViewer struct{}
+type MessageViewer struct {
+	client *gateway.SQSClient
+}
 
-func (v MessageViewer) Process(msg gateway.Message) error {
+func (v *MessageViewer) Process(msg gateway.Message) error {
 	fmt.Printf("%s: %s\n", msg.MessageID, msg.Body)
-	return nil
+	return v.client.DeleteMessage(msg.ReceiptHandle)
 }
 
 func main() {
@@ -23,9 +26,13 @@ func main() {
 		log.Fatalf("new client: %s\n", err)
 	}
 
-	err = client.ReceiveMessage(MessageViewer{})
-	if err != nil {
-		log.Fatalf("recv message: %s\n", err)
+	viewer := &MessageViewer{client: client}
+	for {
+		err = client.ReceiveMessage(viewer)
+		if err != nil {
+			log.Fatalf("recv message: %s\n", err)
+		}
+
+		time.Sleep(5 * time.Second)
 	}
-	log.Println("done")
 }
