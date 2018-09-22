@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -16,11 +17,17 @@ func main() {
 		log.Fatalf("new client: %s\n", err)
 	}
 
-	msg := time.Now().Format("15:04:05")
+	n := 1
+	for {
+		msg := time.Now().Format("15:04:05")
 
-	err = client.SendMessage("1", msg)
-	if err != nil {
-		log.Fatalf("send message: %s\n", err)
+		err = client.SendMessage(fmt.Sprintf("%d", n), msg)
+		n++
+		if err != nil {
+			log.Fatalf("send message: %s\n", err)
+		}
+		log.Println("Successfully sent a message.")
+
+		time.Sleep(3 * time.Second)
 	}
-	log.Println("Successfully sent a message.")
 }
