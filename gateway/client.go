@@ -38,7 +38,8 @@ type MessageProcessor interface {
 
 func (c *SQSClient) ReceiveMessage(processor MessageProcessor) error {
 	resp, err := c.svc.ReceiveMessage(&sqs.ReceiveMessageInput{
-		QueueUrl: c.queueURL,
+		QueueUrl:            c.queueURL,
+		MaxNumberOfMessages: aws.Int64(1),
 	})
 
 	if err != nil {
