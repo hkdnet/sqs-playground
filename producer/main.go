@@ -18,7 +18,7 @@ func main() {
 
 	msg := time.Now().Format("15:04:05")
 
-	err = client.SendMessage(msg)
+	err = client.SendMessage("1", msg)
 	if err != nil {
 		log.Fatalf("send message: %s\n", err)
 	}

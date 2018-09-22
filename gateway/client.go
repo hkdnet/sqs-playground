@@ -62,12 +62,12 @@ func (c *SQSClient) ReceiveMessage(processor MessageProcessor) error {
 }
 
 // メッセージを送信する
-func (c *SQSClient) SendMessage(body string) error {
+func (c *SQSClient) SendMessage(groupID string, body string) error {
 	params := &sqs.SendMessageInput{
 		MessageBody:            aws.String(body),
 		QueueUrl:               c.queueURL,
-		MessageDeduplicationId: aws.String("1"),
-		MessageGroupId:         aws.String("g"),
+		MessageDeduplicationId: aws.String(groupID),
+		MessageGroupId:         aws.String(groupID),
 	}
 
 	_, err := c.svc.SendMessage(params)
