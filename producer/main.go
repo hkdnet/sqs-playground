@@ -17,12 +17,16 @@ func main() {
 		log.Fatalf("new client: %s\n", err)
 	}
 
+	loop(client)
+}
+
+func loop(client *gateway.SQSClient) {
 	n := 1
 	for {
 		limit := time.After(3 * time.Second)
 		msg := time.Now().Format("15:04:05")
 
-		err = client.SendMessage(fmt.Sprintf("%d", n), msg, msg)
+		err := client.SendMessage(fmt.Sprintf("%d", n), msg, msg)
 		n++
 		if err != nil {
 			log.Fatalf("send message: %s\n", err)
