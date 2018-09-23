@@ -22,7 +22,7 @@ func main() {
 		limit := time.After(3 * time.Second)
 		msg := time.Now().Format("15:04:05")
 
-		err = client.SendMessage(fmt.Sprintf("%d", n), msg)
+		err = client.SendMessage(fmt.Sprintf("%d", n), msg, msg)
 		n++
 		if err != nil {
 			log.Fatalf("send message: %s\n", err)
