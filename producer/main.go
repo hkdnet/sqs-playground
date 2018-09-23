@@ -19,6 +19,7 @@ func main() {
 
 	n := 1
 	for {
+		limit := time.After(3 * time.Second)
 		msg := time.Now().Format("15:04:05")
 
 		err = client.SendMessage(fmt.Sprintf("%d", n), msg)
@@ -28,6 +29,6 @@ func main() {
 		}
 		log.Println("Successfully sent a message.")
 
-		time.Sleep(3 * time.Second)
+		<-limit
 	}
 }
