@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/hkdnet/sqs-playground/entity"
 	"github.com/hkdnet/sqs-playground/gateway"
 )
 
@@ -17,7 +18,20 @@ func main() {
 		log.Fatalf("new client: %s\n", err)
 	}
 
-	loop(client)
+	insns(client)
+}
+
+func insns(client *gateway.SQSClient) {
+	insns := []entity.Instruction{
+		entity.Instruction{GroupID: "1", DeduplicationID: "1", Message: "1"},
+	}
+
+	for _, insn := range insns {
+		err := client.SendMessage(insn.GroupID, insn.DeduplicationID, insn.Message)
+		if err != nil {
+			log.Fatalf("send message: %s\n", err)
+		}
+	}
 }
 
 func loop(client *gateway.SQSClient) {
