@@ -40,6 +40,7 @@ func (c *SQSClient) ReceiveMessage(processor MessageProcessor) error {
 	resp, err := c.svc.ReceiveMessage(&sqs.ReceiveMessageInput{
 		QueueUrl:            c.queueURL,
 		MaxNumberOfMessages: aws.Int64(1),
+		WaitTimeSeconds:     aws.Int64(20), // sec
 	})
 
 	if err != nil {
