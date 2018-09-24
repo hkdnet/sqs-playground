@@ -15,11 +15,11 @@ const queueName = "q"
 
 type MessageViewer struct {
 	client *gateway.SQSClient
-
-	ctx context.Context
 }
 
 func (v *MessageViewer) Process(msg gateway.Message) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	ch := make(chan error)
 	go func() {
 		fmt.Printf("%s: %s\n", msg.MessageID, msg.Body)
@@ -27,8 +27,8 @@ func (v *MessageViewer) Process(msg gateway.Message) error {
 	}()
 
 	select {
-	case <-v.ctx.Done():
-		return errors.Wrap(v.ctx.Err(), msg.MessageID)
+	case <-ctx.Done():
+		return errors.Wrap(ctx.Err(), msg.MessageID)
 	case err := <-ch:
 		return err
 	}
@@ -41,20 +41,12 @@ func main() {
 	}
 
 	for {
-		func() {
-			limit := time.After(5 * time.Second)
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-			viewer := &MessageViewer{
-				client: client,
-				ctx:    ctx,
-			}
-			err = client.ReceiveMessage(viewer)
-			if err != nil {
-				log.Fatalf("recv message: %s\n", err)
-			}
-
-			<-limit
-		}()
+		viewer := &MessageViewer{
+			client: client,
+		}
+		err = client.ReceiveMessage(viewer)
+		if err != nil {
+			log.Fatalf("recv message: %s\n", err)
+		}
 	}
 }
